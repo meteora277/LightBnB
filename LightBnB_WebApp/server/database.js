@@ -165,7 +165,7 @@ const getAllProperties = function (options, limit = 10) {
     properties.id`;
   if (options.minimum_rating) {
     queryParams.push(`${options.minimum_rating}`);
-    queryString += ` HAVING avg(rating) > $${queryParams.length}`;
+    queryString += ` HAVING avg(rating) >= $${queryParams.length}`;
   }
 
   queryParams.push(limit);
