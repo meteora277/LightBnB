@@ -137,6 +137,15 @@ const getAllProperties = function (options, limit = 10) {
     queryString += `WHERE LOWER(city) LIKE $${queryParams.length}`;
 
   }
+  if (options.owner_id) {
+    queryParams.push(`${options.owner_id}`);
+    if (options.city) {
+      queryString += ' AND ';
+    }
+    queryString += `WHERE owner_id = $${queryParams.length}`;
+  }
+
+  
 
   queryParams.push(limit);
   queryString += `
