@@ -116,16 +116,42 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
-const getAllProperties = function (options, limit = 1) {
-  return pool
-    .query(
-      `
-    SELECT * FROM properties LIMIT $1
-  `,
-      [limit]
-    )
-    .then((res) => res.rows)
-    .catch((err) => console.log(err));
+const getAllProperties = function (options, limit = 10) {
+
+  let queryParams = [];
+
+  //create queryString based on options user inputs into seacrch form
+
+  let queryString = `
+    SELECT
+      properties.*,
+      AVG(rating) AS average_rating
+    FROM
+      property_reviews
+      JOIN properties ON property_id = properties.id
+  `;
+
+  if (options.city) {
+
+    queryParams.push(`%${options.city.toLowerCase()}%`);
+    queryString += `WHERE LOWER(city) LIKE $${queryParams.length}`;
+
+  }
+
+  queryParams.push(limit);
+  queryString += `
+  GROUP BY
+    properties.id
+  ORDER BY
+    cost_per_night
+  LIMIT
+    $${queryParams.length};
+    `;
+  console.log(queryString, queryParams);
+
+  return pool.query(queryString, queryParams)
+    .then(res => res.rows);
+ 
 };
 exports.getAllProperties = getAllProperties;
 
@@ -135,9 +161,37 @@ exports.getAllProperties = getAllProperties;
  * @return {Promise<{}>} A promise to the property.
  */
 const addProperty = function (property) {
-  const propertyId = Object.keys(properties).length + 1;
-  property.id = propertyId;
-  properties[propertyId] = property;
-  return Promise.resolve(property);
+  return pool.query(`
+SELECT
+  owner_id,
+  title,
+  description,
+  thumbnail_photo_url,
+  cover_photo_url,
+  cost_per_night,
+  parking_spaces,
+  number_of_bathrooms,
+  number_of_bedrooms,
+  country,
+  street,
+  city,
+  province,
+  post_code,
+  active,
+  AVG(rating) AS average_rating
+FROM
+  property_reviews
+  JOIN properties ON property_id = properties.id
+WHERE
+  properties.city LIKE '%ancouve%'
+GROUP BY
+  properties.id
+HAVING
+  avg(property_reviews.rating) >= 4
+ORDER BY
+  cost_per_night
+LIMIT
+  10;
+  `, [property])
 };
 exports.addProperty = addProperty;
