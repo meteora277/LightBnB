@@ -188,9 +188,7 @@ exports.getAllProperties = getAllProperties;
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
-const addProperty = function (property) {
-  return pool.query(`
-SELECT
+const addProperty = function ({
   owner_id,
   title,
   description,
@@ -205,21 +203,64 @@ SELECT
   city,
   province,
   post_code,
-  active,
-  AVG(rating) AS average_rating
-FROM
-  property_reviews
-  JOIN properties ON property_id = properties.id
-WHERE
-  properties.city LIKE '%ancouve%'
-GROUP BY
-  properties.id
-HAVING
-  avg(property_reviews.rating) >= 4
-ORDER BY
-  cost_per_night
-LIMIT
-  10;
-  `, [property])
+  active
+}) {
+  return pool.query(
+    `
+  INSERT INTO
+  properties (
+    owner_id,
+    title,
+    description,
+    thumbnail_photo_url,
+    cover_photo_url,
+    cost_per_night,
+    parking_spaces,
+    number_of_bathrooms,
+    number_of_bedrooms,
+    country,
+    street,
+    city,
+    province,
+    post_code,
+    active
+  )
+VALUES
+  (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5
+    $6,
+    $7,
+    $8,
+    $9,
+    $10,
+    $11,
+    $12,
+    $13,
+    $14,
+    TRUE
+  );
+  `,
+    [
+      owner_id,
+      title,
+      description,
+      thumbnail_photo_url,
+      cover_photo_url,
+      cost_per_night,
+      parking_spaces,
+      number_of_bathrooms,
+      number_of_bedrooms,
+      country,
+      street,
+      city,
+      province,
+      post_code,
+      active
+    ]
+  );
 };
 exports.addProperty = addProperty;
