@@ -1,5 +1,5 @@
+/* eslint-disable camelcase */
 const { Pool } = require("pg/lib");
-const properties = require("./json/properties.json");
 
 /// Users
 
@@ -61,7 +61,7 @@ exports.getUserWithId = getUserWithId;
  * @param {{name: string, password: string, email: string}} user
  * @return {Promise<{}>} A promise to the user.
  */
-const addUser = function (user) {
+const addUser = function(user) {
   
   return pool.query(`
   INSERT INTO users (name, email, password)
@@ -116,7 +116,7 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
-const getAllProperties = function (options, limit = 10) {
+const getAllProperties = function(options, limit = 10) {
 
   let queryParams = [];
 
@@ -142,7 +142,7 @@ const getAllProperties = function (options, limit = 10) {
     if (queryParams.length >= 1) {
       queryString += ' AND ';
     }
-    queryParams.push(`${options.owner_id}`); 
+    queryParams.push(`${options.owner_id}`);
     queryString += `owner_id = $${queryParams.length}`;
   }
   if (options.minimum_price_per_night) {
@@ -188,7 +188,7 @@ exports.getAllProperties = getAllProperties;
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
-const addProperty = function ({
+const addProperty = function({
   owner_id,
   title,
   description,
@@ -202,8 +202,7 @@ const addProperty = function ({
   street,
   city,
   province,
-  post_code,
-  active
+  post_code
 }) {
   return pool.query(
     `
